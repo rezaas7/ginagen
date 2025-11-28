@@ -1,244 +1,138 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>لیست محصولات ژیناژن</title>
-
-  <!-- فونت فارسی خوانا -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vazir-font@26.0.2/dist/font-face.css">
-
   <style>
-    :root {
-      --primary: #2e7d32;
-      --border: #e0e0e0;
-      --bg: #fafafa;
-      --text: #333;
-    }
     body {
-      font-family: Vazir, Tahoma, Segoe UI, sans-serif;
-      margin: 12px;
-      background: var(--bg);
-      color: var(--text);
+      font-family: Vazir, Tahoma, sans-serif;
+      margin: 10px;
+      background: #f9f9f9;
+      color: #333;
     }
     h2 {
-      margin: 8px 0 12px;
-      font-size: 18px;
+      text-align: center;
+      margin-bottom: 15px;
     }
-    .card {
+    .product {
       background: #fff;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
-      overflow: hidden;
-    }
-    .table-wrap {
-      width: 100%;
-      overflow-x: auto;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 720px;
-    }
-    thead th {
-      background: var(--primary);
-      color: #fff;
-      font-weight: 600;
-      padding: 10px 8px;
-      font-size: 13px;
-      position: sticky;
-      top: 0;
-    }
-    tbody td {
-      border-top: 1px solid var(--border);
-      padding: 10px 8px;
-      font-size: 13px;
-      text-align: center;
-    }
-    tbody tr:nth-child(even) {
-      background: #fcfcfc;
-    }
-    input[type="number"] {
-      width: 84px;
-      padding: 8px 6px;
-      border: 1px solid var(--border);
+      border: 1px solid #ddd;
       border-radius: 8px;
-      font-size: 13px;
-      text-align: center;
+      padding: 12px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
     }
-    .footer {
+    .product h3 {
+      font-size: 14px;
+      margin: 0 0 8px;
+    }
+    .info {
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+    .info span {
+      font-weight: bold;
+      color: #2e7d32;
+    }
+    .actions {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 12px;
-      padding: 12px;
-      border-top: 1px solid var(--border);
-      background: #fff;
+      margin-top: 8px;
     }
-    .total-box {
-      flex: 1;
-      background: #f5fff5;
-      border: 2px solid var(--primary);
-      border-radius: 10px;
-      padding: 12px;
-      font-weight: 700;
-      font-size: 16px;
+    input[type="number"] {
+      width: 70px;
+      padding: 6px;
+      font-size: 13px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
       text-align: center;
     }
-    .hint {
-      font-size: 12px;
-      color: #777;
+    .sum {
+      font-weight: bold;
+      color: #d32f2f;
     }
-    @media (max-width: 640px) {
-      table { min-width: 560px; }
-      input[type="number"] { width: 72px; }
-      .total-box { font-size: 15px; }
+    .total-box {
+      position: sticky;
+      bottom: 0;
+      background: #fff;
+      border-top: 2px solid #2e7d32;
+      padding: 12px;
+      font-size: 16px;
+      text-align: center;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
 
   <h2>لیست محصولات ژیناژن</h2>
+  <div id="products"></div>
 
-  <div class="card">
-    <div class="table-wrap">
-      <table id="productTable" aria-label="لیست محصولات">
-        <thead>
-          <tr>
-            <th>نام محصول</th>
-            <th>قیمت داروخانه</th>
-            <th>قیمت مصرف‌کننده</th>
-            <th>تعداد</th>
-            <th>جمع قیمت</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
-
-    <div class="footer">
-     
-      <div class="total-box">جمع کل: <span id="totalPrice">۰</span> ریال</div>
-    </div>
+  <div class="total-box">
+    جمع کل: <span id="totalPrice">۰</span> تومان
   </div>
 
-  <!-- SheetJS برای خواندن اکسل -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script>
-    // فرمت‌کردن اعداد: گرد + سه‌رقمی + اعداد فارسی
-    const formatFa = (num) => new Intl.NumberFormat('fa-IR', { maximumFractionDigits: 0 }).format(Math.round(num || 0));
-
-    // تبدیل هر مقدار به عدد خالی از کاراکترهای غیرعددی (کار با اعداد فارسی/انگلیسی)
-    function toNumber(val) {
-      if (val == null) return 0;
-      // تبدیل اعداد فارسی به لاتین
-      const mapFa = { '۰':'0','۱':'1','۲':'2','۳':'3','۴':'4','۵':'5','۶':'6','۷':'7','۸':'8','۹':'9' };
-      const normalized = String(val).replace(/[۰-۹]/g, (d) => mapFa[d]).replace(/[^\d.-]/g, '');
-      const n = Number(normalized);
-      return isNaN(n) ? 0 : n;
-    }
-
-    // نرمال‌سازی کلیدها: حذف فاصله‌ها، یکنواخت‌سازی نام ستون‌ها
-    function normalizeRow(row) {
-      const out = {};
-      for (const k in row) {
-        const nk = String(k).replace(/\s+/g, ' ').trim();
-        out[nk] = row[k];
-      }
-      return out;
-    }
-
-    // پیدا کردن مقدار ستون با چند نام ممکن (برای تحمل تایپ متفاوت)
-    function pick(row, keys) {
-      for (const key of keys) {
-        if (row[key] != null && row[key] !== '') return row[key];
-      }
-      return null;
-    }
-
-    // نام‌های احتمالی ستون‌ها (با توجه به فایل ارسالی)
-    const NAME_KEYS = ["نام محصول", "نام کالا", "نام"];
-    const PHARM_KEYS = ["قیمت داروخانه", "قیمت داورخانه", "قیمت دارو خانه"];
-    const CONS_KEYS  = ["قیمت مصرف کننده", "قیمت مصرف‌کننده", "قیمت مصرف"];
-
     let products = [];
     let rowTotals = [];
 
-    // خواندن فایل اکسل از مسیر پروژه (باید از روی http اجرا شود)
+    const formatFa = (num) => new Intl.NumberFormat('fa-IR').format(Math.round(num || 0));
+
     fetch("ginagen.xlsx")
-      .then(res => {
-        if (!res.ok) throw new Error("خطا در دریافت فایل اکسل");
-        return res.arrayBuffer();
-      })
+      .then(res => res.arrayBuffer())
       .then(buf => {
         const wb = XLSX.read(buf, { type: "array" });
         const sheet = wb.Sheets[wb.SheetNames[0]];
         const raw = XLSX.utils.sheet_to_json(sheet, { defval: "" });
-        products = raw.map(r => {
-          const row = normalizeRow(r);
-          const name = pick(row, NAME_KEYS) || "";
-          const pharm = toNumber(pick(row, PHARM_KEYS));
-          const cons  = toNumber(pick(row, CONS_KEYS));
-          return { name, pharm, cons };
-        }).filter(p => p.name);
-
+        products = raw.map(r => ({
+          name: r["نام محصول"],
+          pharm: Number(r["قیمت داورخانه"] || 0),
+          cons: Number(r["قیمت مصرف کننده"] || 0)
+        }));
         rowTotals = new Array(products.length).fill(0);
         render(products);
-      })
-      .catch(err => {
-        console.error(err);
-        // اگر لازم شد پیام کاربرپسند نشان بدهیم:
-        document.querySelector("#productTable tbody").innerHTML =
-          `<tr><td colspan="5">داده‌ها بارگذاری نشد. اطمینان حاصل کنید فایل در کنار همین صفحه و از روی http اجرا می‌شود.</td></tr>`;
       });
 
     function render(list) {
-      const tbody = document.querySelector("#productTable tbody");
-      tbody.innerHTML = "";
-
+      const container = document.getElementById("products");
+      container.innerHTML = "";
       list.forEach((p, i) => {
-        const tr = document.createElement("tr");
-
-        const nameTd  = `<td>${p.name}</td>`;
-        const pharmTd = `<td>${formatFa(p.pharm)}</td>`;
-        const consTd  = `<td>${formatFa(p.cons)}</td>`;
-        const qtyTd   = `<td><input type="number" min="0" value="0" data-index="${i}" inputmode="numeric" /></td>`;
-        const sumTd   = `<td id="sum-${i}">۰</td>`;
-
-        tr.innerHTML = nameTd + pharmTd + consTd + qtyTd + sumTd;
-        tbody.appendChild(tr);
+        const div = document.createElement("div");
+        div.className = "product";
+        div.innerHTML = `
+          <h3>${p.name}</h3>
+          <div class="info">قیمت داروخانه: <span>${formatFa(p.pharm)}</span></div>
+          <div class="info">قیمت مصرف‌کننده: ${formatFa(p.cons)}</div>
+          <div class="actions">
+            <input type="number" min="0" value="0" data-index="${i}" />
+            <div class="sum" id="sum-${i}">۰</div>
+          </div>
+        `;
+        container.appendChild(div);
       });
 
-      // لیسنر زنده برای همه ورودی‌ها
-      tbody.querySelectorAll('input[type="number"]').forEach(inp => {
-        inp.addEventListener('input', onQtyChange);
-        inp.addEventListener('change', onQtyChange);
+      container.querySelectorAll("input[type='number']").forEach(inp => {
+        inp.addEventListener("input", onQtyChange);
       });
-
-      // به‌روزرسانی اولیه جمع کل
-      updateTotal();
     }
 
     function onQtyChange(e) {
       const idx = Number(e.target.dataset.index);
-      const qty = toNumber(e.target.value);
-      const price = qty * (products[idx]?.pharm || 0); // محاسبه براساس قیمت داروخانه
+      const qty = Number(e.target.value);
+      const price = qty * (products[idx]?.pharm || 0);
       rowTotals[idx] = price;
-
-      // نمایش جمع ردیف
-      const cell = document.getElementById(`sum-${idx}`);
-      if (cell) cell.textContent = formatFa(price);
-
-      // جمع کل
+      document.getElementById(`sum-${idx}`).textContent = formatFa(price);
       updateTotal();
     }
 
     function updateTotal() {
-      const total = rowTotals.reduce((s, v) => s + (v || 0), 0);
-      document.getElementById('totalPrice').textContent = formatFa(total);
+      const total = rowTotals.reduce((s, v) => s + v, 0);
+      document.getElementById("totalPrice").textContent = formatFa(total);
     }
   </script>
 </body>
 </html>
-
