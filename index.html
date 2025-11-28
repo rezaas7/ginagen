@@ -5,11 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>لیست محصولات ژیناژن</title>
   <style>
+    @import url('https://cdn.jsdelivr.net/npm/vazir-font@26.0.2/dist/font-face.css');
+
     body {
-      font-family: sans-serif;
+      font-family: Vazir, Tahoma, sans-serif;
       margin: 10px;
       background: #f9f9f9;
       color: #333;
+      direction: rtl;
     }
     table {
       width: 100%;
@@ -33,10 +36,12 @@
     }
     .total-box {
       background: #fff;
-      padding: 10px;
-      border: 1px solid #ddd;
-      font-size: 16px;
+      padding: 12px;
+      border: 2px solid #4CAF50;
+      font-size: 18px;
       text-align: center;
+      font-weight: bold;
+      border-radius: 6px;
     }
     @media (max-width: 600px) {
       table, th, td {
@@ -65,7 +70,7 @@
   </table>
 
   <div class="total-box">
-    جمع کل: <span id="totalPrice">0</span> تومان
+    جمع کل: <span id="totalPrice">۰</span> تومان
   </div>
 
   <!-- کتابخانه SheetJS -->
@@ -98,7 +103,7 @@
           <td>${formatNumber(p["قیمت داورخانه"])}</td>
           <td>${formatNumber(p["قیمت مصرف کننده"])}</td>
           <td><input type="number" min="0" value="0" onchange="updatePrice(${index}, this.value)" /></td>
-          <td id="price-${index}">0</td>
+          <td id="price-${index}">۰</td>
         `;
         tbody.appendChild(row);
       });
@@ -106,13 +111,13 @@
 
     function updatePrice(index, qty) {
       const product = products[index];
-      const price = qty * product["قیمت مصرف کننده"];
+      const price = qty * product["قیمت داورخانه"]; // محاسبه بر اساس قیمت داروخانه
       document.getElementById(`price-${index}`).innerText = formatNumber(price);
 
       // محاسبه جمع کل
       total = 0;
       products.forEach((p, i) => {
-        const val = document.getElementById(`price-${i}`).innerText.replace(/,/g, "");
+        const val = document.getElementById(`price-${i}`).innerText.replace(/٬/g, "");
         total += parseInt(val) || 0;
       });
       document.getElementById("totalPrice").innerText = formatNumber(total);
