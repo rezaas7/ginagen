@@ -77,7 +77,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script>
     let products = [];
-    let total = 0;
+    let totals = []; // آرایه برای ذخیره جمع هر ردیف
 
     // خواندن فایل Excel از مسیر پروژه (کنار همین HTML)
     fetch("ginagen.xlsx")
@@ -86,6 +86,7 @@
         const workbook = XLSX.read(data, { type: "array" });
         const sheet = workbook.Sheets[workbook.SheetNames[0]];
         products = XLSX.utils.sheet_to_json(sheet);
+        totals = new Array(products.length).fill(0); // مقدار اولیه صفر
         renderProducts(products);
       });
 
@@ -112,15 +113,12 @@
     function updatePrice(index, qty) {
       const product = products[index];
       const price = qty * product["قیمت داورخانه"]; // ✅ محاسبه بر اساس قیمت داروخانه
+      totals[index] = price; // ذخیره جمع هر ردیف
       document.getElementById(`price-${index}`).innerText = formatNumber(price);
 
-      // ✅ محاسبه جمع کل
-      total = 0;
-      products.forEach((p, i) => {
-        const val = document.getElementById(`price-${i}`).innerText.replace(/[^\d]/g, "");
-        total += parseInt(val) || 0;
-      });
-      document.getElementById("totalPrice").innerText = formatNumber(total);
+      // ✅ محاسبه جمع کل از آرایه totals
+      const totalSum = totals.reduce((a, b) => a + b, 0);
+      document.getElementById("totalPrice").innerText = formatNumber(totalSum);
     }
   </script>
 </body>
