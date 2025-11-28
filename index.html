@@ -38,12 +38,13 @@
     }
     .actions {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
+      flex-direction: column; /* ✅ عمودی */
+      align-items: center;    /* ✅ وسط‌چین */
+      gap: 6px;
       margin-top: 8px;
     }
     input[type="number"] {
-      width: 70px;
+      width: 80px;
       padding: 6px;
       font-size: 13px;
       border: 1px solid #ccc;
@@ -53,6 +54,7 @@
     .sum {
       font-weight: bold;
       color: #d32f2f;
+      font-size: 14px;
     }
     .total-box {
       position: sticky;
@@ -123,7 +125,7 @@
     function onQtyChange(e) {
       const idx = Number(e.target.dataset.index);
       const qty = Number(e.target.value);
-      const price = qty * (products[idx]?.pharm || 0);
+      const price = qty * (products[idx]?.pharm || 0); // ✅ محاسبه بر اساس قیمت داروخانه
       rowTotals[idx] = price;
       document.getElementById(`sum-${idx}`).textContent = formatFa(price);
       updateTotal();
