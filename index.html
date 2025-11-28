@@ -70,15 +70,8 @@
       cursor: pointer;
       color: #fff;
     }
-    .qty-control button:active {
-      transform: scale(0.95);
-    }
-    .btn-minus {
-      background: #d32f2f; /* قرمز */
-    }
-    .btn-plus {
-      background: #1976d2; /* آبی */
-    }
+    .btn-minus { background: #d32f2f; } /* قرمز */
+    .btn-plus { background: #1976d2; } /* آبی */
     input[type="number"] {
       width: 70px;
       padding: 8px;
@@ -95,17 +88,66 @@
       padding: 4px 10px;
       border-radius: 8px;
     }
-    .total-box {
+    .footer {
       position: sticky;
       bottom: 0;
-      background: linear-gradient(90deg, #2e7d32, #43a047);
-      color: #fff;
-      padding: 16px;
-      font-size: 16px;
-      text-align: center;
-      font-weight: bold;
-      box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
+      background: #fff;
+      padding: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 2px solid #2e7d32;
     }
+    .total-box {
+      font-size: 16px;
+      font-weight: bold;
+      color: #2e7d32;
+    }
+    .next-btn {
+      background: #2e7d32;
+      color: #fff;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .next-btn:active { transform: scale(0.95); }
+    /* صفحه مرحله بعد */
+    #summaryPage {
+      display: none;
+      padding: 12px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: center;
+    }
+    th {
+      background: #2e7d32;
+      color: #fff;
+    }
+    .summary-actions {
+      margin-top: 12px;
+      display: flex;
+      gap: 10px;
+    }
+    .summary-actions button {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      color: #fff;
+    }
+    .back-btn { background: #1976d2; }
+    .print-btn { background: #d32f2f; }
   </style>
 </head>
 <body>
@@ -113,8 +155,30 @@
   <h2>🛒 لیست محصولات ژیناژن</h2>
   <div class="products" id="products"></div>
 
-  <div class="total-box">
-    جمع کل: <span id="totalPrice">۰</span> ریال
+  <div class="footer">
+    <div class="total-box">جمع کل: <span id="totalPrice">۰</span> ریال</div>
+    <button class="next-btn" onclick="goToSummary()">مرحله‌ی بعد</button>
+  </div>
+
+  <!-- صفحه مرحله بعد -->
+  <div id="summaryPage">
+    <h2>📋 محصولات انتخاب‌شده</h2>
+    <table id="summaryTable">
+      <thead>
+        <tr>
+          <th>نام محصول</th>
+          <th>قیمت</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <div class="total-box" style="margin-top:10px;">
+      جمع کل: <span id="summaryTotal">۰</span> ریال
+    </div>
+    <div class="summary-actions">
+      <button class="back-btn" onclick="goBack()">بازگشت</button>
+      <button class="print-btn" onclick="printSummary()">چاپ</button>
+    </div>
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -175,19 +239,4 @@
     }
 
     function onQtyChange(e) {
-      const idx = Number(e.target.dataset.index);
-      const qty = Number(e.target.value);
-      const price = qty * (products[idx]?.pharm || 0); // ✅ محاسبه بر اساس قیمت داروخانه
-      rowTotals[idx] = price;
-      document.getElementById(`sum-${idx}`).textContent = formatFa(price);
-      updateTotal();
-    }
-
-    function updateTotal() {
-      const total = rowTotals.reduce((s, v) => s + v, 0);
-      document.getElementById("totalPrice").textContent = formatFa(total);
-    }
-  </script>
-</body>
-</html>
-
+      const idx = Number(e.target
