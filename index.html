@@ -111,13 +111,13 @@
 
     function updatePrice(index, qty) {
       const product = products[index];
-      const price = qty * product["قیمت داورخانه"]; // محاسبه بر اساس قیمت داروخانه
+      const price = qty * product["قیمت داورخانه"]; // ✅ محاسبه بر اساس قیمت داروخانه
       document.getElementById(`price-${index}`).innerText = formatNumber(price);
 
-      // محاسبه جمع کل
+      // ✅ محاسبه جمع کل
       total = 0;
       products.forEach((p, i) => {
-        const val = document.getElementById(`price-${i}`).innerText.replace(/٬/g, "");
+        const val = document.getElementById(`price-${i}`).innerText.replace(/[^\d]/g, "");
         total += parseInt(val) || 0;
       });
       document.getElementById("totalPrice").innerText = formatNumber(total);
