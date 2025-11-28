@@ -3,75 +3,98 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>لیست محصولات ژیناژن</title>
+  <title>محصولات ژیناژن</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vazir-font@26.0.2/dist/font-face.css">
   <style>
     body {
       font-family: Vazir, Tahoma, sans-serif;
-      margin: 10px;
-      background: #f9f9f9;
+      margin: 0;
+      background: #f0f2f5;
       color: #333;
     }
     h2 {
       text-align: center;
-      margin-bottom: 15px;
+      padding: 14px;
+      background: linear-gradient(90deg, #43a047, #2e7d32);
+      color: #fff;
+      margin: 0;
+      font-size: 18px;
+      font-weight: bold;
+    }
+    .products {
+      padding: 12px;
     }
     .product {
-      background: #fff;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 12px;
-      margin-bottom: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      background: linear-gradient(135deg, #ffffff, #f9f9f9);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      transition: transform 0.2s;
+    }
+    .product:hover {
+      transform: translateY(-3px);
     }
     .product h3 {
-      font-size: 14px;
-      margin: 0 0 8px;
+      font-size: 15px;
+      margin: 0 0 10px;
+      color: #2e7d32;
     }
     .info {
       font-size: 13px;
       margin-bottom: 6px;
     }
-    .info span {
-      font-weight: bold;
-      color: #2e7d32;
+    .badge {
+      display: inline-block;
+      background: #43a047;
+      color: #fff;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      margin-right: 6px;
     }
     .actions {
       display: flex;
-      flex-direction: column; /* ✅ عمودی */
-      align-items: center;    /* ✅ وسط‌چین */
-      gap: 6px;
-      margin-top: 8px;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
     }
     input[type="number"] {
-      width: 80px;
-      padding: 6px;
-      font-size: 13px;
+      width: 100%;
+      max-width: 120px;
+      padding: 10px;
+      font-size: 14px;
       border: 1px solid #ccc;
-      border-radius: 6px;
+      border-radius: 8px;
       text-align: center;
+      background: #fff;
     }
     .sum {
       font-weight: bold;
       color: #d32f2f;
       font-size: 14px;
+      background: #ffeaea;
+      padding: 4px 10px;
+      border-radius: 8px;
     }
     .total-box {
       position: sticky;
       bottom: 0;
-      background: #fff;
-      border-top: 2px solid #2e7d32;
-      padding: 12px;
+      background: linear-gradient(90deg, #2e7d32, #43a047);
+      color: #fff;
+      padding: 16px;
       font-size: 16px;
       text-align: center;
       font-weight: bold;
+      box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
     }
   </style>
 </head>
 <body>
 
-  <h2>لیست محصولات ژیناژن</h2>
-  <div id="products"></div>
+  <h2>🛒 لیست محصولات ژیناژن</h2>
+  <div class="products" id="products"></div>
 
   <div class="total-box">
     جمع کل: <span id="totalPrice">۰</span> تومان
@@ -107,8 +130,8 @@
         div.className = "product";
         div.innerHTML = `
           <h3>${p.name}</h3>
-          <div class="info">قیمت داروخانه: <span>${formatFa(p.pharm)}</span></div>
-          <div class="info">قیمت مصرف‌کننده: ${formatFa(p.cons)}</div>
+          <div class="info"><span class="badge">داروخانه</span> ${formatFa(p.pharm)}</div>
+          <div class="info"><span class="badge">مصرف‌کننده</span> ${formatFa(p.cons)}</div>
           <div class="actions">
             <input type="number" min="0" value="0" data-index="${i}" />
             <div class="sum" id="sum-${i}">۰</div>
